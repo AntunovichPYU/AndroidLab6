@@ -12,13 +12,14 @@ class MainActivity : AppCompatActivity() {
 
     private var secondsElapsed: Int = 0
     private lateinit var textSecondsElapsed: TextView
+    private lateinit var backgroundThread: Thread
 
     @Volatile
     private var isRunning = false
 
     private val runnable = Runnable {
-        Log.d("Thread", "is running")
         while (isRunning) {
+            Log.d("Thread", "is running $secondsElapsed seconds")
             textSecondsElapsed.post {
                 textSecondsElapsed.text =
                     getString(R.string.secondsElapsed, secondsElapsed++)
@@ -27,7 +28,6 @@ class MainActivity : AppCompatActivity() {
         }
         Log.d("Thread", "is stopped")
     }
-    private lateinit var backgroundThread: Thread
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,20 +42,20 @@ class MainActivity : AppCompatActivity() {
         Log.d("Activity", "is created")
     }
 
-    override fun onResume() {
+    override fun onStart() {
         Log.d("Activity", "is resumed")
         if (!isRunning) {
             isRunning = true
             backgroundThread = Thread(runnable)
             backgroundThread.start()
         }
-        super.onResume()
+        super.onStart()
     }
 
-    override fun onPause() {
+    override fun onStop() {
         Log.d("Activity", "is paused")
         isRunning = false
-        super.onPause()
+        super.onStop()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

@@ -9,6 +9,7 @@ import android.widget.ImageView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.net.URL
 
 class MainActivityCoroutines : AppCompatActivity() {
@@ -23,12 +24,13 @@ class MainActivityCoroutines : AppCompatActivity() {
             Log.d("button", "clicked")
             imageView = findViewById(R.id.imageView)
             it.isClickable = false
-            MainScope().launch(Dispatchers.IO) {
-                val urlImg = URL(urlStr)
-                val imageBitmap = BitmapFactory.decodeStream(urlImg.openConnection().getInputStream())
-                imageView.post {
-                    imageView.setImageBitmap(imageBitmap)
+            val urlImg = URL(urlStr)
+            MainScope().launch {
+                val imageBitmap = withContext(Dispatchers.IO) {
+                    BitmapFactory.decodeStream(urlImg.openConnection().getInputStream())
                 }
+                imageView.setImageBitmap(imageBitmap)
+
                 Log.d("Image", "Downloaded")
             }
         }
